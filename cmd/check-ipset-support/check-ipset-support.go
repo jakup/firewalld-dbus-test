@@ -26,21 +26,19 @@ func main() {
 
     obj := conn.Object("org.fedoraproject.FirewallD1", dbus.ObjectPath("/org/fedoraproject/FirewallD1"))
 
-    p, err := obj.GetProperty("org.fedoraproject.FirewallD1.IPSet")
+    hasIPSetSupport, err := obj.GetProperty("org.fedoraproject.FirewallD1.IPSet")
     checkError(err, "Unable to read IPSet property")
 
-    hasIPSetSupport := p.Value().(bool)
     fmt.Println("firewall has IPSet support:", hasIPSetSupport)
-    if ! hasIPSetSupport {
+    if ! hasIPSetSupport.Value().(bool) {
         os.Exit(0)
     }
 
-    p, err = obj.GetProperty("org.fedoraproject.FirewallD1.IPSetTypes")
+    supportedTypes, err := obj.GetProperty("org.fedoraproject.FirewallD1.IPSetTypes")
     checkError(err, "Unable to read IPSetTypes property")
 
-    supportedTypes := p.Value().([]string)
     fmt.Println("supported IPSet types:")
-    for _, t := range supportedTypes {
+    for _, t := range supportedTypes.Value().([]string) {
         fmt.Printf("  - %s\n", t)
     }
 }
